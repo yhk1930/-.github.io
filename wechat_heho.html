@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>和好请求</title>
+    <style>
+        * {margin: 0; padding: 0; box-sizing: border-box; font-family: "微软雅黑", sans-serif;}
+        body {
+            background: #fce4ec;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden; /* 防止按钮放大后页面滚动 */
+        }
+        .title {
+            font-size: 28px;
+            color: #c2185b;
+            font-weight: bold;
+            margin-bottom: 60px;
+            text-align: center;
+            z-index: 1; /* 保证标题始终在最上层 */
+        }
+        .btn-group {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            z-index: 1; /* 保证按钮初始在最上层 */
+        }
+        .btn {
+            border: none;
+            border-radius: 60px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease; /* 平滑放大/缩小，无突兀感 */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            white-space: nowrap; /* 防止按钮文字换行 */
+        }
+        #yes {
+            background: #e91e63;
+            padding: 18px 36px; /* 初始大小 */
+        }
+        #no {
+            background: #9e9e9e;
+            padding: 18px 36px; /* 初始大小 */
+        }
+        /* 提示框样式 - 居中悬浮，醒目突出 */
+        .tip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 30px;
+            box-shadow: 0 0 30px rgba(233,30,99,0.4);
+            z-index: 999; /* 提示框最上层 */
+            display: none;
+        }
+        .tip-text {
+            font-size: 26px;
+            color: #c2185b;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">你能和我和好嘛？</div>
+    <div class="btn-group" id="btnGroup">
+        <button class="btn" id="yes">能</button>
+        <button class="btn" id="no">不能</button>
+    </div>
+    <div class="tip" id="tip">
+        <div class="tip-text">感谢小妈的原谅，爱你 ❤️</div>
+    </div>
+
+    <script>
+        // 获取页面元素
+        const yesBtn = document.getElementById('yes');
+        const noBtn = document.getElementById('no');
+        const tipBox = document.getElementById('tip');
+        const btnGroup = document.getElementById('btnGroup');
+
+        // 定义放大/缩小步长（每次点击的变化幅度，可调整）
+        const scaleStep = 1.3; // 能按钮每次放大1.3倍，不能按钮每次缩小为1/1.3
+        let yesScale = 1; // 能按钮初始缩放比例
+        let noScale = 1;  // 不能按钮初始缩放比例
+
+        // 点击「能」：弹出指定文字，点击空白处可关闭，不影响按钮状态
+        yesBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止触发空白处关闭事件
+            tipBox.style.display = 'block'; // 显示提示框
+        });
+
+        // 点击页面空白处：关闭提示框
+        document.addEventListener('click', (e) => {
+            if (!tipBox.contains(e.target) && e.target !== yesBtn) {
+                tipBox.style.display = 'none';
+            }
+        });
+
+        // 点击「不能」：能按钮持续放大、不能按钮持续缩小，循环生效
+        noBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止触发空白处关闭事件
+            // 能按钮：缩放比例叠加，持续放大
+            yesScale *= scaleStep;
+            yesBtn.style.transform = `scale(${yesScale})`;
+            yesBtn.style.zIndex = 2; // 放大后置于上层，避免被遮挡
+            
+            // 不能按钮：缩放比例递减，持续缩小
+            noScale /= scaleStep;
+            noBtn.style.transform = `scale(${noScale})`;
+            
+            // 可选：当能按钮放大到一定程度，调整间距防止重叠（优化体验）
+            if (yesScale > 2) {
+                btnGroup.style.gap = '80px';
+            }
+            if (yesScale > 3) {
+                btnGroup.style.gap = '120px';
+            }
+        });
+    </script>
+</body>
+</html>
+
